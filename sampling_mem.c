@@ -278,7 +278,7 @@ int main(int argc, char **argv)
 	struct perf_event_attr load_attr = {
 		.type = PERF_TYPE_RAW,
 		//.config = 0x1cd,      // see libpfm4
-		.config = load_event,	// see libpfm4
+		.config = load_event,	
 		.disabled = 1,
 		.precise_ip = 2,
 		.exclude_kernel = 1,
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 	struct perf_event_attr store_attr = {
 		.type = PERF_TYPE_RAW,
 		//.config = 0x82d0,      // see libpfm4
-		.config = store_event,	// see libpfm4
+		.config = store_event,	
 		.disabled = 1,
 		.precise_ip = 2,
 		.exclude_kernel = 1,
@@ -439,9 +439,9 @@ int main(int argc, char **argv)
 				total_count++;
 
 				fprintf(stdout,
-					"sample_id: %6lld, cpu: %3d, pid: %6d, tid: %6d, ip: %20llx, src level: %s, latency: %6lld\n",
+					"sample_id: %6lld, cpu: %3d, pid: %6d, tid: %6d, ip: %20llx, src level: %s, latency: %6lld, opcode: %s\n",
 					sample_id, cpu, pid, tid, ip,
-					get_data_src_level(data_src), weight);
+					get_data_src_level(data_src), weight, get_data_src_opcode(data_src));
 
 				perf_mmap__consume(map);
 			}
