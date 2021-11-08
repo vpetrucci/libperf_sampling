@@ -13,7 +13,11 @@
 #include <assert.h>
 #include <perfmon/pfmlib_perf_event.h>
 
-char *concat(const char *s1, const char *s2)
+char *concat(const
+	     char
+	     *s1, const
+	     char
+	     *s2)
 {
 	char *result = malloc(strlen(s1) + strlen(s2) + 1);
 	if (result == NULL) {
@@ -24,7 +28,8 @@ char *concat(const char *s1, const char *s2)
 	return result;
 }
 
-int is_served_by_local_cache1(union perf_mem_data_src data_src)
+int is_served_by_local_cache1(union
+			      perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_L1) {
@@ -34,7 +39,8 @@ int is_served_by_local_cache1(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_local_cache2(union perf_mem_data_src data_src)
+int is_served_by_local_cache2(union
+			      perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_L2) {
@@ -44,7 +50,8 @@ int is_served_by_local_cache2(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_local_cache3(union perf_mem_data_src data_src)
+int is_served_by_local_cache3(union
+			      perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_L3) {
@@ -54,7 +61,8 @@ int is_served_by_local_cache3(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_local_lfb(union perf_mem_data_src data_src)
+int is_served_by_local_lfb(union
+			   perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_LFB) {
@@ -64,7 +72,8 @@ int is_served_by_local_lfb(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_local_cache(union perf_mem_data_src data_src)
+int is_served_by_local_cache(union
+			     perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_L1) {
@@ -83,7 +92,8 @@ int is_served_by_local_cache(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_local_memory(union perf_mem_data_src data_src)
+int is_served_by_local_memory(union
+			      perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_LOC_RAM) {
@@ -93,7 +103,8 @@ int is_served_by_local_memory(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_remote_cache_or_local_memory(union perf_mem_data_src data_src)
+int is_served_by_remote_cache_or_local_memory(union
+					      perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT
 	    && data_src.mem_lvl & PERF_MEM_LVL_REM_CCE1) {
@@ -102,7 +113,8 @@ int is_served_by_remote_cache_or_local_memory(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_remote_memory(union perf_mem_data_src data_src)
+int is_served_by_remote_memory(union
+			       perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		if (data_src.mem_lvl & PERF_MEM_LVL_REM_RAM1) {
@@ -114,7 +126,8 @@ int is_served_by_remote_memory(union perf_mem_data_src data_src)
 	return 0;
 }
 
-int is_served_by_local_NA_miss(union perf_mem_data_src data_src)
+int is_served_by_local_NA_miss(union
+			       perf_mem_data_src data_src)
 {
 	if (data_src.mem_lvl & PERF_MEM_LVL_NA) {
 		return 1;
@@ -153,6 +166,48 @@ char *get_data_src_opcode(union perf_mem_data_src data_src)
 	if (data_src.mem_op & PERF_MEM_OP_EXEC) {
 		old_res = res;
 		res = concat(res, "Exec code");
+		free(old_res);
+	}
+	return res;
+}
+
+char *get_data_src_dtlb(union perf_mem_data_src data_src)
+{
+	char *res = concat("", "");
+	char *old_res;
+	if (data_src.mem_dtlb & PERF_MEM_TLB_NA) {
+		old_res = res;
+		res = concat(res, "TLB_NA");
+		free(old_res);
+	}
+	if (data_src.mem_dtlb & PERF_MEM_TLB_HIT) {
+		old_res = res;
+		res = concat(res, "TLB_HIT");
+		free(old_res);
+	}
+	if (data_src.mem_dtlb & PERF_MEM_TLB_MISS) {
+		old_res = res;
+		res = concat(res, "TLB_MISS");
+		free(old_res);
+	}
+	if (data_src.mem_dtlb & PERF_MEM_TLB_L1) {
+		old_res = res;
+		res = concat(res, "TLB_L1");
+		free(old_res);
+	}
+	if (data_src.mem_dtlb & PERF_MEM_TLB_L2) {
+		old_res = res;
+		res = concat(res, "TLB_L2");
+		free(old_res);
+	}
+	if (data_src.mem_dtlb & PERF_MEM_TLB_WK) {
+		old_res = res;
+		res = concat(res, "TLB_WK");
+		free(old_res);
+	}
+	if (data_src.mem_dtlb & PERF_MEM_TLB_OS) {
+		old_res = res;
+		res = concat(res, "TLB_OS");
 		free(old_res);
 	}
 	return res;
@@ -211,6 +266,11 @@ char *get_data_src_level(union perf_mem_data_src data_src)
 		old_res = res;
 		res = concat(res, "Uncached_Memory");
 		free(old_res);
+	} else {
+		old_res = res;
+		res = concat(res, "Unknown");
+		printf("mem_lvl: %d\n", data_src.mem_lvl);
+		free(old_res);
 	}
 	if (data_src.mem_lvl & PERF_MEM_LVL_HIT) {
 		old_res = res;
@@ -224,8 +284,8 @@ char *get_data_src_level(union perf_mem_data_src data_src)
 	return res;
 }
 
-static int
-libperf_print(enum libperf_print_level level, const char *fmt, va_list ap)
+static int libperf_print(enum
+			 libperf_print_level level, const char *fmt, va_list ap)
 {
 	return vfprintf(stderr, fmt, ap);
 }
@@ -235,10 +295,12 @@ union u64_swap {
 	__u32 val32[2];
 };
 
-int encode_event(const char *event_name)
+int encode_event(const char
+		 *event_name)
 {
 	pfm_perf_encode_arg_t perf_encoded;
-	struct perf_event_attr perf_attr;
+	struct
+	perf_event_attr perf_attr;
 	memset(&perf_encoded, 0, sizeof(perf_encoded));
 	perf_encoded.size = sizeof(perf_encoded);
 	perf_encoded.attr = &perf_attr;
@@ -256,13 +318,24 @@ int encode_event(const char *event_name)
 	return perf_attr.config;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char
+	 **argv)
 {
-	struct perf_evlist *evlist;
-	struct perf_evsel *load_evsel;
-	struct perf_evsel *store_evsel;
-	struct perf_mmap *map;
-	struct perf_cpu_map *cpus;
+	struct
+	    perf_evlist
+	*evlist;
+	struct
+	    perf_evsel
+	*load_evsel;
+	struct
+	    perf_evsel
+	*store_evsel;
+	struct
+	    perf_mmap
+	*map;
+	struct
+	    perf_cpu_map
+	*cpus;
 
 	int curr_err = pfm_initialize();
 	if (curr_err != PFM_SUCCESS) {
@@ -275,10 +348,11 @@ int main(int argc, char **argv)
 	int store_event = encode_event("MEM_UOPS_RETIRED:ALL_STORES");
 	assert(store_event != -1);
 
-	struct perf_event_attr load_attr = {
+	struct
+	perf_event_attr load_attr = {
 		.type = PERF_TYPE_RAW,
 		//.config = 0x1cd,      // see libpfm4
-		.config = load_event,	
+		.config = load_event,
 		.disabled = 1,
 		.precise_ip = 2,
 		.exclude_kernel = 1,
@@ -289,13 +363,14 @@ int main(int argc, char **argv)
 		//.sample_period = 1000,
 		//.sample_type = PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_CPU|PERF_SAMPLE_PERIOD,
 		.sample_type =
-		    PERF_SAMPLE_IDENTIFIER | PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
-		    PERF_SAMPLE_WEIGHT | PERF_SAMPLE_DATA_SRC,
+		    PERF_SAMPLE_IDENTIFIER | PERF_SAMPLE_IP | PERF_SAMPLE_TID |
+		    PERF_SAMPLE_CPU | PERF_SAMPLE_WEIGHT | PERF_SAMPLE_DATA_SRC,
 	};
-	struct perf_event_attr store_attr = {
+	struct
+	perf_event_attr store_attr = {
 		.type = PERF_TYPE_RAW,
 		//.config = 0x82d0,      // see libpfm4
-		.config = store_event,	
+		.config = store_event,
 		.disabled = 1,
 		.precise_ip = 2,
 		.exclude_kernel = 1,
@@ -306,12 +381,14 @@ int main(int argc, char **argv)
 		//.sample_period = 1000,
 		//.sample_type = PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_CPU|PERF_SAMPLE_PERIOD,
 		.sample_type =
-		    PERF_SAMPLE_IDENTIFIER | PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
-		    PERF_SAMPLE_WEIGHT | PERF_SAMPLE_DATA_SRC,
+		    PERF_SAMPLE_IDENTIFIER | PERF_SAMPLE_IP | PERF_SAMPLE_TID |
+		    PERF_SAMPLE_CPU | PERF_SAMPLE_WEIGHT | PERF_SAMPLE_DATA_SRC,
 	};
 
 	int err = -1;
-	union perf_event *event;
+	union
+	    perf_event
+	*event;
 
 	libperf_init(libperf_print);
 
@@ -361,7 +438,7 @@ int main(int argc, char **argv)
 		sleep(5);
 		perf_evlist__disable(evlist);
 
-                printf("-----\n");
+		printf("-----\n");
 
 		perf_evlist__for_each_mmap(evlist, map, false) {
 			if (perf_mmap__read_init(map) < 0)
@@ -371,8 +448,10 @@ int main(int argc, char **argv)
 				const __u32 type = event->header.type;
 				int cpu, pid, tid;
 				__u64 ip, sample_id, weight, *array;
-				union u64_swap u;
-				union perf_mem_data_src data_src;
+				union
+				u64_swap u;
+				union
+				perf_mem_data_src data_src;
 
 				int na_miss_count = 0;
 				int cache1_count = 0;
@@ -393,7 +472,7 @@ int main(int argc, char **argv)
 
 				sample_id = *array;
 				array++;
-				
+
 				ip = *array;
 				array++;
 
@@ -438,10 +517,13 @@ int main(int argc, char **argv)
 				}
 				total_count++;
 
-				fprintf(stdout,
-					"sample_id: %6lld, cpu: %3d, pid: %6d, tid: %6d, ip: %20llx, src level: %s, latency: %6lld, opcode: %s\n",
-					sample_id, cpu, pid, tid, ip,
-					get_data_src_level(data_src), weight, get_data_src_opcode(data_src));
+				fprintf
+				    (stdout,
+				     "sample_id: %6lld, cpu: %3d, pid: %6d, tid: %6d, ip: %20llx, src level: %s, latency: %6lld, opcode: %s\n",
+				     sample_id,
+				     cpu,
+				     pid, tid, ip, get_data_src_level(data_src),
+				     weight, get_data_src_opcode(data_src));
 
 				perf_mmap__consume(map);
 			}
