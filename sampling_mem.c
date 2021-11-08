@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 		//.sample_period = 1000,
 		//.sample_type = PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_CPU|PERF_SAMPLE_PERIOD,
 		.sample_type =
-		    PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
+		    PERF_SAMPLE_IDENTIFIER | PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
 		    PERF_SAMPLE_WEIGHT | PERF_SAMPLE_DATA_SRC,
 	};
 	struct perf_event_attr store_attr = {
@@ -301,12 +301,12 @@ int main(int argc, char **argv)
 		.exclude_kernel = 1,
 		.exclude_user = 0,
 		.exclude_hv = 1,
-		//.freq = 1,
-		//.sample_freq = 100,
-		.sample_period = 1000,
+		.freq = 1,
+		.sample_freq = 100,
+		//.sample_period = 1000,
 		//.sample_type = PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_CPU|PERF_SAMPLE_PERIOD,
 		.sample_type =
-		    PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
+		    PERF_SAMPLE_IDENTIFIER | PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
 		    PERF_SAMPLE_WEIGHT | PERF_SAMPLE_DATA_SRC,
 	};
 
@@ -339,7 +339,7 @@ int main(int argc, char **argv)
 	}
 
 	perf_evlist__add(evlist, load_evsel);
-	//perf_evlist__add(evlist, store_evsel);
+	perf_evlist__add(evlist, store_evsel);
 
 	perf_evlist__set_maps(evlist, cpus, NULL);
 
@@ -358,7 +358,6 @@ int main(int argc, char **argv)
 	while (1) {
 
 		perf_evlist__enable(evlist);
-		//perf_evlist__poll(evlist, 1000);
 		sleep(5);
 		perf_evlist__disable(evlist);
 
@@ -369,8 +368,9 @@ int main(int argc, char **argv)
 				continue;
 
 			while ((event = perf_mmap__read_event(map)) != NULL) {
+				const __u32 type = event->header.type;
 				int cpu, pid, tid;
-				__u64 ip, weight, *array;
+				__u64 ip, sample_id, weight, *array;
 				union u64_swap u;
 				union perf_mem_data_src data_src;
 
@@ -384,8 +384,16 @@ int main(int argc, char **argv)
 				int remote_cache_count = 0;
 				int total_count = 0;
 
+				if (type != PERF_RECORD_SAMPLE) {
+					perf_mmap__consume(map);
+					continue;
+				}
+
 				array = event->sample.array;
 
+				sample_id = *array;
+				array++;
+				
 				ip = *array;
 				array++;
 
@@ -431,8 +439,8 @@ int main(int argc, char **argv)
 				total_count++;
 
 				fprintf(stdout,
-					"cpu: %3d, pid: %6d, tid: %6d, ip: %20llx, src level: %s, latency: %6lld\n",
-					cpu, pid, tid, ip,
+					"sample_id: %6lld, cpu: %3d, pid: %6d, tid: %6d, ip: %20llx, src level: %s, latency: %6lld\n",
+					sample_id, cpu, pid, tid, ip,
 					get_data_src_level(data_src), weight);
 
 				perf_mmap__consume(map);
