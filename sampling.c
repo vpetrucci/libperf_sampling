@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 static int libperf_print(enum libperf_print_level level,
-                         const char *fmt, va_list ap)
+			 const char *fmt, va_list ap)
 {
 	return vfprintf(stderr, fmt, ap);
 }
@@ -27,12 +27,14 @@ int main(int argc, char **argv)
 	struct perf_mmap *map;
 	struct perf_cpu_map *cpus;
 	struct perf_event_attr attr = {
-		.type        = PERF_TYPE_HARDWARE,
-		.config      = PERF_COUNT_HW_CPU_CYCLES,
-		.disabled    = 1,
-		.freq        = 1,
+		.type = PERF_TYPE_HARDWARE,
+		.config = PERF_COUNT_HW_CPU_CYCLES,
+		.disabled = 1,
+		.freq = 1,
 		.sample_freq = 10,
-		.sample_type = PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_CPU|PERF_SAMPLE_PERIOD,
+		.sample_type =
+		    PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_CPU |
+		    PERF_SAMPLE_PERIOD,
 	};
 	int err = -1;
 	union perf_event *event;
@@ -102,7 +104,8 @@ int main(int argc, char **argv)
 
 			period = *array;
 
-			fprintf(stdout, "cpu %3d, pid %6d, tid %6d, ip %20llx, period %20llu\n",
+			fprintf(stdout,
+				"cpu %3d, pid %6d, tid %6d, ip %20llx, period %20llu\n",
 				cpu, pid, tid, ip, period);
 
 			perf_mmap__consume(map);
@@ -111,9 +114,9 @@ int main(int argc, char **argv)
 		perf_mmap__read_done(map);
 	}
 
-out_evlist:
+ out_evlist:
 	perf_evlist__delete(evlist);
-out_cpus:
+ out_cpus:
 	perf_cpu_map__put(cpus);
 	return err;
 }
