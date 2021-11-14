@@ -156,12 +156,13 @@ int main(int argc, char **argv)
 
       perf_evlist__for_each_mmap(evlist, map, false) {
 
-          rmb();
 
           if (perf_mmap__read_init(map) < 0)
               continue;
 
-          while ((event = perf_mmap__read_event(map)) != NULL) {
+          rmb();
+          
+	  while ((event = perf_mmap__read_event(map)) != NULL) {
               const __u32 type = event->header.type; 
 
               if (type != PERF_RECORD_SAMPLE) {
